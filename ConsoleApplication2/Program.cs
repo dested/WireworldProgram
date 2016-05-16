@@ -12,7 +12,7 @@ namespace ConsoleApplication2
     {
         static void Main(string[] args)
         {
-            var registries = new List<Registry>()
+            registries = new List<Registry>()
             {
                 new Registry("0000"),
                 new Registry("001e"),
@@ -97,8 +97,8 @@ namespace ConsoleApplication2
                 {
                     nextOne = true;
                 }
-//                Console.SetCursorPosition(0, line++);
-                Execute(registries);
+                //                Console.SetCursorPosition(0, line++);
+                Execute();
 
                 int f = 0;
                 /*foreach (var item in registries)
@@ -107,21 +107,21 @@ namespace ConsoleApplication2
                     Console.Write(f.ToString().PadLeft(2, '0') + ": " + item.Location1.ToString("x2") + item.Location2.ToString("x2") + " " + item.Data);
                     f++;
                 }*/
-//                Console.ReadLine();
+                //                Console.ReadLine();
 
             }
         }
 
-        private static void Execute(List<Registry> registries)
+        private static void Execute()
         {
-            var counter = programCounter;
+            //            var counter = programCounter;
             var reg = registries[programCounter++];
 
 
-            var value = Read(registries, reg.Location2);
-            Write(registries, reg.Location1, new Registry(value.ToString("x"), true));
+            var value = Read(reg.Location2);
+            Write(reg.Location1, value);
 
-//            Console.Write($"{counter} Move from {reg.Location2}({value.ToString("x")}) to {reg.Location1} ({registries[reg.Location1].Data })");
+            //            Console.Write($"{counter} Move from {reg.Location2}({value.ToString("x")}) to {reg.Location1} ({registries[reg.Location1].Data })");
 
         }
 
@@ -129,30 +129,32 @@ namespace ConsoleApplication2
 
         private static short nextProgramCounter = -1;
 
-        private static void Write(List<Registry> registries, byte location, Registry registry)
+        private static void Write(byte location, short registry)
         {
             switch (location)
             {
                 case 0:
-                    var cc = Console.CursorTop;
-                   Console.SetCursorPosition(40,0);
-                    display = registry.Data;
-                    Console.Write(display);
-                    Console.SetCursorPosition(0, cc);
+                    //                    var cc = Console.CursorTop;
+                    //                   Console.SetCursorPosition(40,0);
+                    display = registry;
+                    Console.WriteLine(display);
+                    //                    Console.SetCursorPosition(0, cc);
                     break;
                 case 63:
-                    nextProgramCounter = registry.Data;
+                    nextProgramCounter = registry;
 
                     break;
                 default:
-                    registries[location] = registry;
+                    registries[location].Data = registry;
                     break;
             }
         }
 
 
         private static short programCounter = 1;
-        private static short Read(List<Registry> registries, byte location)
+        private static List<Registry> registries;
+
+        private static short Read(byte location)
         {
             switch (location)
             {
