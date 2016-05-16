@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,7 +12,7 @@ namespace ConsoleApplication2
     class Program
     {
         private static List<Registry> registries;
-        static short[] ram=new short[64];
+        static short[] ram = new short[64];
         private static byte[] registriesLocation1 = new byte[64];
         private static byte[] registriesLocation2 = new byte[64];
         static void Main(string[] args)
@@ -91,27 +92,33 @@ namespace ConsoleApplication2
                 registriesLocation2[index] = registries[index].Location2;
             }
 
-
+            long c = 0;
             int line = 0;
-            bool nextOne = false;
+            stopwatch.Start();
+
             while (true)
             {
-
-                if (nextOne)
+                c ++;
+                if (c%100000000 == 0)
                 {
-                    programCounter = nextProgramCounter;
-                    nextProgramCounter = -1;
-                    nextOne = false;
+                    Console.WriteLine("Ms Per Run: "+(((stopwatch.ElapsedTicks / (double)(Stopwatch.Frequency / (double)1000 / 1000 / 1000)) / (double)c).ToString("F10")));
+                    stopwatch.Reset();
+                    stopwatch.Start();
                 }
                 if (nextProgramCounter != -1)
                 {
-                    nextOne = true;
+                    Execute();
+                    programCounter = nextProgramCounter;
+                    nextProgramCounter = -1;
                 }
-                //                Console.SetCursorPosition(0, line++);
-                Execute();
+                else
+                {
+                    Execute();
 
-                int f = 0;
-                /*foreach (var item in registries)
+                }                //                Console.SetCursorPosition(0, line++);
+
+                /*int f = 0;
+                foreach (var item in registries)
                 {
                     Console.SetCursorPosition(50, f);
                     Console.Write(f.ToString().PadLeft(2, '0') + ": " + item.Location1.ToString("x2") + item.Location2.ToString("x2") + " " + item.Data);
@@ -122,11 +129,11 @@ namespace ConsoleApplication2
             }
         }
 
+        private static Stopwatch stopwatch=new Stopwatch();
         private static void Execute()
         {
             //            var counter = programCounter;
             var s = programCounter++;
-
 
             var value = Read(registriesLocation2[s]);
             Write(registriesLocation1[s], value);
@@ -147,12 +154,11 @@ namespace ConsoleApplication2
                     //                    var cc = Console.CursorTop;
                     //                   Console.SetCursorPosition(40,0);
                     display = registry;
-                    Console.WriteLine(display);
+//                    Console.WriteLine(display);
                     //                    Console.SetCursorPosition(0, cc);
                     break;
                 case 63:
                     nextProgramCounter = registry;
-
                     break;
                 default:
                     ram[location] = registry;
