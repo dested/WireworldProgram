@@ -10,6 +10,10 @@ namespace ConsoleApplication2
 {
     class Program
     {
+        private static List<Registry> registries;
+        static short[] ram=new short[64];
+        private static byte[] registriesLocation1 = new byte[64];
+        private static byte[] registriesLocation2 = new byte[64];
         static void Main(string[] args)
         {
             registries = new List<Registry>()
@@ -80,6 +84,12 @@ namespace ConsoleApplication2
                 new Registry("0000"),
             };
 
+            for (int index = 0; index < registries.Count; index++)
+            {
+                ram[index] = registries[index].Data;
+                registriesLocation1[index] = registries[index].Location1;
+                registriesLocation2[index] = registries[index].Location2;
+            }
 
 
             int line = 0;
@@ -115,11 +125,11 @@ namespace ConsoleApplication2
         private static void Execute()
         {
             //            var counter = programCounter;
-            var reg = registries[programCounter++];
+            var s = programCounter++;
 
 
-            var value = Read(reg.Location2);
-            Write(reg.Location1, value);
+            var value = Read(registriesLocation2[s]);
+            Write(registriesLocation1[s], value);
 
             //            Console.Write($"{counter} Move from {reg.Location2}({value.ToString("x")}) to {reg.Location1} ({registries[reg.Location1].Data })");
 
@@ -145,14 +155,13 @@ namespace ConsoleApplication2
 
                     break;
                 default:
-                    registries[location].Data = registry;
+                    ram[location] = registry;
                     break;
             }
         }
 
 
         private static short programCounter = 1;
-        private static List<Registry> registries;
 
         private static short Read(byte location)
         {
@@ -161,27 +170,27 @@ namespace ConsoleApplication2
                 case 0:
                     return 0;
                 case 53:
-                    return (short)(registries[54].Data & ~registries[53].Data);
+                    return (short)(ram[54] & ~ram[53]);
                 case 54:
-                    return (short)(registries[53].Data & ~registries[54].Data);
+                    return (short)(ram[53] & ~ram[54]);
                 case 55:
                     return 0;
                 case 56:
-                    return registries[56].Data == 0 ? registries[57].Data : registries[55].Data;
+                    return ram[56] == 0 ? ram[57] : ram[55];
                 case 57:
                     return 0;
                 case 58:
-                    return (short)((registries[58].Data >> 1) | (registries[58].Data << (15 - 1)));
+                    return (short)((ram[58] >> 1) | (ram[58] << (15 - 1)));
                 case 59:
-                    return (short)((registries[59].Data >> 1) | (registries[59].Data << (15 - 1)));
+                    return (short)((ram[59] >> 1) | (ram[59] << (15 - 1)));
                 case 61:
-                    return (short)(registries[60].Data + registries[61].Data);
+                    return (short)(ram[60] + ram[61]);
                 case 62:
-                    return (short)(~registries[62].Data);
+                    return (short)(~ram[62]);
                 case 63:
                     return programCounter;
                 default:
-                    return registries[location].Data;
+                    return ram[location];
             }
         }
     }
